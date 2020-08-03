@@ -42,7 +42,7 @@
 
         The default value for android:required if not declared is "true".
     -->
-    <uses-feature android:name="com.motorola.hardware.mods"/>
+    <uses-feature android:name="com.motorola.hardware.mods" />
 
     <!--
         If your application uses any of functionality of the ModManager, it needs to declare
@@ -56,7 +56,7 @@
     <uses-permission android:name="com.motorola.mod.permission.MOD_ACCESS_INFO" />
     <uses-permission android:name="com.motorola.mod.permission.RAW_PROTOCOL" />
 
-    <supports-screens android:xlargeScreens="true"/>
+    <supports-screens android:xlargeScreens="true" />
 
     <application
         android:name=".MDKUtilityApplication"

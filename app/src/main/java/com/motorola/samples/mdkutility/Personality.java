@@ -1,29 +1,29 @@
-/**
- * Copyright (c) 2016 Motorola Mobility, LLC.
- * All rights reserved.
- * <p/>
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holder nor the names of its
- * contributors may be used to endorse or promote products derived from this
- * software without specific prior written permission.
- * <p/>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/*
+  Copyright (c) 2016 Motorola Mobility, LLC.
+  All rights reserved.
+  <p/>
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+  1. Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+  3. Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from this
+  software without specific prior written permission.
+  <p/>
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package com.motorola.samples.mdkutility;
@@ -50,8 +50,8 @@ import java.util.List;
  * A class to represent the Moto Mod interface.
  */
 public class Personality {
-    protected BroadcastReceiver modReceiver;
-    protected Context context;
+    protected final BroadcastReceiver modReceiver;
+    protected final Context context;
 
     /**
      * ModManager interface
@@ -66,34 +66,47 @@ public class Personality {
     /**
      * Listeners to notify mod event and data
      */
-    List<Handler> listeners = new ArrayList<>();
+    final List<Handler> listeners = new ArrayList<>();
+    /**
+     * Bind with Moto Mod service
+     */
+    private final ServiceConnection mConnection = new ServiceConnection() {
 
-    /** Constructor */
+        public void onServiceConnected(ComponentName className,
+                                       IBinder binder) {
+            IModManager mMgrSrvc = IModManager.Stub.asInterface(binder);
+            modManager = new ModManager(context, mMgrSrvc);
+            onModAttach(true);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            modDevice = null;
+            modManager = null;
+            onModAttach(false);
+        }
+    };
+
+    /**
+     * Constructor
+     */
     public Personality(Context context) {
         this.context = context;
 
-        /** Bind with Moto Mod service */
+        /* Bind with Moto Mod service */
         Intent service = new Intent(ModManager.ACTION_BIND_MANAGER);
         service.setComponent(ModManager.MOD_SERVICE_NAME);
         context.bindService(service, mConnection, Context.BIND_AUTO_CREATE);
 
-        /** Register Mod intents receiver */
+        /* Register Mod intents receiver */
         modReceiver = new MyBroadcastReceiver();
         IntentFilter filter = new IntentFilter(ModManager.ACTION_MOD_ATTACH);
         filter.addAction(ModManager.ACTION_MOD_DETACH);
-        /**
-         * Request the broadcaster who send these intents must hold permission PERMISSION_MOD_INTERNAL,
-         * to avoid the intent from fake senders. For future details, refer to:
-         * https://developer.android.com/reference/android/content/Context.html#registerReceiver
+        /*
+          Request the broadcaster who send these intents must hold permission PERMISSION_MOD_INTERNAL,
+          to avoid the intent from fake senders. For future details, refer to:
+          https://developer.android.com/reference/android/content/Context.html#registerReceiver
          */
         context.registerReceiver(modReceiver, filter, ModManager.PERMISSION_MOD_INTERNAL, null);
-    }
-
-    /** Clean up */
-    public void onDestroy() {
-        listeners.clear();
-        context.unregisterReceiver(modReceiver);
-        context.unbindService(mConnection);
     }
 
     // Personality common interface - Begin
@@ -142,24 +155,18 @@ public class Personality {
         }
     }
 
-    /** Bind with Moto Mod service */
-    private ServiceConnection mConnection = new ServiceConnection() {
+    /**
+     * Clean up
+     */
+    public void onDestroy() {
+        listeners.clear();
+        context.unregisterReceiver(modReceiver);
+        context.unbindService(mConnection);
+    }
 
-        public void onServiceConnected(ComponentName className,
-                                       IBinder binder) {
-            IModManager mMgrSrvc = IModManager.Stub.asInterface(binder);
-            modManager = new ModManager(context, mMgrSrvc);
-            onModAttach(true);
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            modDevice = null;
-            modManager = null;
-            onModAttach(false);
-        }
-    };
-
-    /** Query mod device when attach/detach event */
+    /**
+     * Query mod device when attach/detach event
+     */
     protected void onModAttach(boolean attach) {
         new Thread(new Runnable() {
             public void run() {
@@ -168,7 +175,9 @@ public class Personality {
         }).start();
     }
 
-    /** Query and update mod device info */
+    /**
+     * Query and update mod device info
+     */
     protected void updateModList() {
         if (modManager == null) {
             onModDevice(null);
@@ -176,7 +185,7 @@ public class Personality {
         }
 
         try {
-            /** Get currently mod device list from ModManager */
+            /* Get currently mod device list from ModManager */
             List<ModDevice> l = modManager.getModList(false);
             if (l == null || l.size() == 0) {
                 onModDevice(null);
@@ -195,19 +204,23 @@ public class Personality {
         }
     }
 
-    /** Notify listeners the mod device info */
+    /**
+     * Notify listeners the mod device info
+     */
     public void onModDevice(ModDevice d) {
         modDevice = d;
         notifyListeners(MSG_MOD_DEVICE);
     }
 
-    /** Handle mod device attach/detach event */
+    /**
+     * Handle mod device attach/detach event
+     */
     private class MyBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (ModManager.ACTION_MOD_ATTACH.equals(action)) {
-                /** Mod device attached */
+                /* Mod device attached */
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -215,7 +228,7 @@ public class Personality {
                     }
                 }, 1000);
             } else if (ModManager.ACTION_MOD_DETACH.equals(action)) {
-                /** Mod device detached */
+                /* Mod device detached */
                 onModAttach(false);
             }
         }

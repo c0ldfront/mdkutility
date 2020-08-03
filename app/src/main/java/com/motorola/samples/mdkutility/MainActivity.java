@@ -1,29 +1,29 @@
-/**
- * Copyright (c) 2016 Motorola Mobility, LLC.
- * All rights reserved.
- * <p/>
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holder nor the names of its
- * contributors may be used to endorse or promote products derived from this
- * software without specific prior written permission.
- * <p/>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/*
+  Copyright (c) 2016 Motorola Mobility, LLC.
+  All rights reserved.
+  <p/>
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+  1. Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+  3. Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from this
+  software without specific prior written permission.
+  <p/>
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package com.motorola.samples.mdkutility;
@@ -90,30 +90,30 @@ public class MainActivity extends Activity implements View.OnClickListener {
     /**
      * Handler for events from mod device
      */
-    private Handler handler = new Handler() {
+    private final Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case Personality.MSG_MOD_DEVICE:
-                    /** Mod attach/detach */
+                    /* Mod attach/detach */
                     ModDevice device = fwPersonality.getModDevice();
                     onModDevice(device);
                     break;
                 case Personality.MSG_UPDATE_START:
-                    /** Mod firmware update started */
+                    /* Mod firmware update started */
                     Toast.makeText(MainActivity.this,
                             getString(R.string.firmware_update_started), Toast.LENGTH_SHORT).show();
                     break;
                 case Personality.MSG_UPDATE_DONE:
-                    /** Mod firmware update finished */
+                    /* Mod firmware update finished */
                     int result = msg.arg1;
 
                     if (result == 1) {
-                        /** User cancelled update */
+                        /* User cancelled update */
                         break;
                     }
 
                     if (result == 11) {
-                        /** Update in queue */
+                        /* Update in queue */
                         break;
                     }
 
@@ -135,18 +135,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     }
                     break;
                 case Personality.MSG_RAW_REQUEST_PERMISSION:
-                    /** Request user to grant RAW protocol permission */
+                    /* Request user to grant RAW protocol permission */
                     requestPermissions(new String[]{ModManager.PERMISSION_USE_RAW_PROTOCOL},
                             REQUEST_RAW_PERMISSION);
                     break;
                 case Personality.MSG_REQUEST_FIRMWARE:
-                    /** The mod request firmware due to missing or invalid firmware */
-                        /** Exit activity when ModManager is trying to reload firmware */
-                        finish();
+                    /* The mod request firmware due to missing or invalid firmware */
+                    /* Exit activity when ModManager is trying to reload firmware */
+                    finish();
                     break;
                 case RawPersonalityService.BLINKY_STATUS:
-                    /** The LED light status is changed */
-                    Switch led = (Switch) findViewById(R.id.switch_led);
+                    /* The LED light status is changed */
+                    Switch led = findViewById(R.id.switch_led);
                     if (led != null) {
                         if ((rawService != null) &&
                                 rawService.isRawInterfaceReady()) {
@@ -159,7 +159,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     }
                     break;
                 case RawPersonalityService.EXIT_APP:
-                    /** Exit main activity UI */
+                    /* Exit main activity UI */
                     finish();
                     break;
                 default:
@@ -172,7 +172,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     /**
      * Bind to the background service
      */
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private final ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             rawService = ((RawPersonalityService.LocalBinder) service).getService();
             if (rawService != null) {
@@ -183,7 +183,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         public void onServiceDisconnected(ComponentName className) {
             rawService = null;
-            Switch led = (Switch) findViewById(R.id.switch_led);
+            Switch led = findViewById(R.id.switch_led);
             if (led != null) {
                 led.setEnabled(false);
                 led.setChecked(false);
@@ -195,15 +195,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setActionBar(toolbar);
 
-        LinearLayout dipTitle = (LinearLayout)findViewById(R.id.layout_dip_description_title);
+        LinearLayout dipTitle = findViewById(R.id.layout_dip_description_title);
         dipTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LinearLayout dipDescription = (LinearLayout)findViewById(R.id.layout_dip_description);
-                ImageView imgExpand = (ImageView)findViewById(R.id.imageview_description_img);
+                LinearLayout dipDescription = findViewById(R.id.layout_dip_description);
+                ImageView imgExpand = findViewById(R.id.imageview_description_img);
 
                 if (dipDescription.getVisibility() == View.GONE) {
                     dipDescription.setVisibility(View.VISIBLE);
@@ -218,7 +218,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         });
 
-        Switch switcher = (Switch) findViewById(R.id.switch_led);
+        Switch switcher = findViewById(R.id.switch_led);
         switcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -230,32 +230,32 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     serviceIntent.putExtra(RawPersonalityService.BLINKY,
                             RawPersonalityService.BLINKY_OFF);
                 }
-                /** Call RawPersonalityService to toggle LED */
+                /* Call RawPersonalityService to toggle LED */
                 startService(serviceIntent);
             }
         });
 
-        TextView textView = (TextView) findViewById(R.id.mod_external_dev_portal);
+        TextView textView = findViewById(R.id.mod_external_dev_portal);
         if (textView != null) {
             textView.setOnClickListener(this);
         }
 
-        textView = (TextView) findViewById(R.id.mod_external_source_code);
+        textView = findViewById(R.id.mod_external_source_code);
         if (textView != null) {
             textView.setOnClickListener(this);
         }
 
-        Button button = (Button) findViewById(R.id.firmware_update_select_file);
+        Button button = findViewById(R.id.firmware_update_select_file);
         if (button != null) {
             button.setOnClickListener(this);
         }
 
-        button = (Button) findViewById(R.id.firmware_update_perform);
+        button = findViewById(R.id.firmware_update_perform);
         if (button != null) {
             button.setOnClickListener(this);
         }
 
-        /** Start background service to check LED light status */
+        /* Start background service to check LED light status */
         Intent serviceIntent = new Intent(MainActivity.this, RawPersonalityService.class);
         startService(serviceIntent);
     }
@@ -283,7 +283,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (null == fwPersonality) {
             fwPersonality = new FirmwarePersonality(this);
 
-            /** Register handler to get event and data update */
+            /* Register handler to get event and data update */
             fwPersonality.registerListener(handler);
         }
 
@@ -325,7 +325,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         int id = item.getItemId();
 
         if (id == R.id.action_about) {
-            /** Get the UUID from attached mod device */
+            /* Get the UUID from attached mod device */
             String uid = getString(R.string.na);
             if (fwPersonality != null
                     && fwPersonality.getModDevice() != null
@@ -363,22 +363,22 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         switch (v.getId()) {
             case R.id.mod_external_dev_portal:
-                /** The Developer Portal link is clicked */
+                /* The Developer Portal link is clicked */
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.URL_DEV_PORTAL)));
                 break;
             case R.id.mod_external_source_code:
-                /** The accessing source code link is clicked */
+                /* The accessing source code link is clicked */
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.URL_SOURCE_CODE)));
                 break;
             case R.id.firmware_update_select_file:
-                /** The Select Firmware File link is clicked */
+                /* The Select Firmware File link is clicked */
                 if (null == fwPersonality.getModDevice()) {
                     Toast.makeText(this, getString(R.string.mod_not_ready),
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                /** Only allow firmware flashing when mod VID is VID_DEVELOPER */
+                /* Only allow firmware flashing when mod VID is VID_DEVELOPER */
                 if (fwPersonality.getModDevice().getVendorId() != Constants.VID_DEVELOPER) {
                     showAlert(getString(R.string.mod_not_0x42));
                     return;
@@ -387,14 +387,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 selectFile();
                 break;
             case R.id.firmware_update_perform:
-                /** The Perform Firmware Update button is clicked */
+                /* The Perform Firmware Update button is clicked */
                 if (null == fwPersonality.getModDevice()) {
                     Toast.makeText(this, getString(R.string.mod_not_ready),
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                /** Only allow firmware flashing when mod VID is VID_DEVELOPER */
+                /* Only allow firmware flashing when mod VID is VID_DEVELOPER */
                 if (fwPersonality.getModDevice().getVendorId() != Constants.VID_DEVELOPER) {
                     showAlert(getString(R.string.mod_not_0x42));
                     return;
@@ -409,7 +409,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     return;
                 }
 
-                /** Send request to ModManager to flash firmware files */
+                /* Send request to ModManager to flash firmware files */
                 int result = fwPersonality.performUpdate(this, pendingFirmware);
                 if (result != FirmwarePersonality.FIRMWARE_UPDATE_SUCCESS) {
                     showFirmwareUpdateFailure(result);
@@ -429,11 +429,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
         switch (result) {
             case FirmwarePersonality.FIRMWARE_UPDATE_ILLEGAL_EXCEPTION:
                 reason = getString(R.string.firmware_update_failed)
-                    + getString(R.string.firmware_illegal_argument_exception);
+                        + getString(R.string.firmware_illegal_argument_exception);
                 break;
             case FirmwarePersonality.FIRMWARE_UPDATE_SECURITY_EXCEPTION:
                 reason = getString(R.string.firmware_update_failed)
-                    + getString(R.string.firmware_security_exception);
+                        + getString(R.string.firmware_security_exception);
                 break;
         }
         Toast.makeText(MainActivity.this, reason, Toast.LENGTH_SHORT).show();
@@ -464,8 +464,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 // You may need pop up a description dialog or other prompts to explain
                 // the app cannot work without the permission granted.
 
-                /** Disable LED control as no RAW permission, to write control command to it */
-                Switch led = (Switch) findViewById(R.id.switch_led);
+                /* Disable LED control as no RAW permission, to write control command to it */
+                Switch led = findViewById(R.id.switch_led);
                 if (led != null) {
                     led.setEnabled(false);
                     led.setChecked(false);
@@ -480,7 +480,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             return;
         }
 
-        /** Got selected files */
+        /* Got selected files */
         if (requestCode == REQUEST_SELECT_FIRMWARE) {
             if (data != null) {
                 Uri uri = data.getData();
@@ -502,7 +502,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 if (null != pendingFirmware
                         && pendingFirmware.size() != 0) {
 
-                    /** Get selected file names */
+                    /* Get selected file names */
                     boolean start = true;
                     StringBuilder sb = new StringBuilder();
                     for (Uri u : pendingFirmware) {
@@ -515,11 +515,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                         start = false;
                     }
 
-                    /** Update selected files on UI */
-                    TextView tv = (TextView) findViewById(R.id.firmware_update_file);
+                    /* Update selected files on UI */
+                    TextView tv = findViewById(R.id.firmware_update_file);
                     tv.setText(sb.toString());
 
-                    /** Start firmware update */
+                    /* Start firmware update */
                     if (null != fwPersonality.getModDevice()
                             && null != pendingFirmware
                             && pendingFirmware.size() != 0
@@ -539,7 +539,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
      * Mod device attach/detach
      */
     public void onModDevice(ModDevice device) {
-        /** Request RAW permission for Blinky Personality Card, to create RAW I/O */
+        /* Request RAW permission for Blinky Personality Card, to create RAW I/O */
         if (device != null) {
             if ((device.getVendorId() == Constants.VID_MDK
                     && device.getProductId() == Constants.PID_BLINKY)
@@ -548,12 +548,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
 
-        /** Moto Mods Status */
-        /**
-         * Get mod device's Product String, which should correspond to
-         * the product name or the vendor internal's name.
+        /* Moto Mods Status */
+        /*
+          Get mod device's Product String, which should correspond to
+          the product name or the vendor internal's name.
          */
-        TextView tvName = (TextView) findViewById(R.id.mod_name);
+        TextView tvName = findViewById(R.id.mod_name);
         if (null != tvName) {
             tvName.setTextColor(getColor(R.color.mod_mismatch));
             if (null != device) {
@@ -569,11 +569,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
 
-        /**
-         * Get mod device's Vendor ID. This is assigned by the Motorola
-         * and unique for each vendor.
+        /*
+          Get mod device's Vendor ID. This is assigned by the Motorola
+          and unique for each vendor.
          */
-        TextView tvVid = (TextView) findViewById(R.id.mod_status_vid);
+        TextView tvVid = findViewById(R.id.mod_status_vid);
         if (null != tvVid) {
             if (device == null
                     || device.getVendorId() == Constants.INVALID_ID) {
@@ -584,8 +584,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
 
-        /** Get mod device's Product ID. This is assigned by the vendor */
-        TextView tvPid = (TextView) findViewById(R.id.mod_status_pid);
+        /* Get mod device's Product ID. This is assigned by the vendor */
+        TextView tvPid = findViewById(R.id.mod_status_pid);
         if (null != tvPid) {
             if (device == null
                     || device.getProductId() == Constants.INVALID_ID) {
@@ -596,8 +596,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
 
-        /** Get mod device's version of the firmware */
-        TextView tvFirmware = (TextView) findViewById(R.id.mod_status_firmware);
+        /* Get mod device's version of the firmware */
+        TextView tvFirmware = findViewById(R.id.mod_status_firmware);
         if (null != tvFirmware) {
             if (null != device && null != device.getFirmwareVersion()
                     && !device.getFirmwareVersion().isEmpty()) {
@@ -607,11 +607,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
 
-        /**
-         * Get the default Android application associated with the currently attached mod,
-         * as read from the mod hardware manifest.
+        /*
+          Get the default Android application associated with the currently attached mod,
+          as read from the mod hardware manifest.
          */
-        TextView tvPackage = (TextView) findViewById(R.id.mod_status_package_name);
+        TextView tvPackage = findViewById(R.id.mod_status_package_name);
         if (null != tvPackage) {
             if (device == null
                     || fwPersonality.getModManager() == null) {
@@ -627,9 +627,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
 
-        /** Firmware Update */
-        /** Show/hide the unable to flash reason */
-        TextView tvUReason = (TextView) findViewById(R.id.no_update_reason);
+        /* Firmware Update */
+        /* Show/hide the unable to flash reason */
+        TextView tvUReason = findViewById(R.id.no_update_reason);
         if (tvUReason != null) {
             if ((device == null) ||
                     (device.getVendorId() == Constants.VID_DEVELOPER)) {
@@ -638,8 +638,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 tvUReason.setVisibility(View.VISIBLE);
             }
         }
-        /** Update Firmware Files/Update button status */
-        Button btFiles = (Button) findViewById(R.id.firmware_update_select_file);
+        /* Update Firmware Files/Update button status */
+        Button btFiles = findViewById(R.id.firmware_update_select_file);
         if (btFiles != null) {
             if ((device == null) ||
                     (device.getVendorId() != Constants.VID_DEVELOPER)) {
@@ -648,7 +648,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 btFiles.setEnabled(true);
             }
         }
-        Button btFlash = (Button) findViewById(R.id.firmware_update_perform);
+        Button btFlash = findViewById(R.id.firmware_update_perform);
         if (btFlash != null) {
             if ((device == null) ||
                     (device.getVendorId() != Constants.VID_DEVELOPER)) {
@@ -658,9 +658,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
 
-        /** LED Controls */
-        /** Update LED swith button status */
-        Switch led = (Switch) findViewById(R.id.switch_led);
+        /* LED Controls */
+        /* Update LED switch button status */
+        Switch led = findViewById(R.id.switch_led);
         if (led != null) {
             if ((device == null) || (rawService == null)) {
                 led.setEnabled(false);
@@ -677,7 +677,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
      */
     private boolean isMDKMod(ModDevice device) {
         if (device == null) {
-            /** Mod is not available */
+            /* Mod is not available */
             return false;
         } else if (device.getVendorId() == Constants.VID_DEVELOPER) {
             // MDK in developer mode
